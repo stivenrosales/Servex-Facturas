@@ -1,0 +1,7 @@
+{
+  "name": "InvoiceReader AI - Servex Style",
+  "description": "An intelligent invoice extraction system that uses Gemini AI to process images, extract tax data (RUC), company details, and line items, then exports them to CSV.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
