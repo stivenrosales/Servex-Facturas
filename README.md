@@ -1,6 +1,6 @@
-# 🧾 Invoice Reader AI - Servex Style
+# 🧾 Servex Facturas - Sistema de Procesamiento Inteligente de Facturas
 
-Una aplicación web moderna para procesar facturas automáticamente usando **Google Gemini AI**. Extrae información clave de imágenes de facturas y exporta los datos a Excel o CSV.
+Sistema completo de detección y procesamiento de facturas con **IA (Google Gemini)** y **auto-relleno automático de datos contables** para Servex BPO.
 
 ![React](https://img.shields.io/badge/React-19.2.3-blue?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.8.2-blue?logo=typescript)
