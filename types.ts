@@ -16,6 +16,8 @@ export interface InvoiceData {
   items: InvoiceItem[];
   montoTotalFactura: number;
   imageUrl?: string;
+  fileType?: 'image' | 'pdf'; // Tipo de archivo (imagen o PDF)
+  fileName?: string; // Nombre original del archivo
   accounting?: AccountingData; // Datos contables mapeados
 }
 

@@ -76,7 +76,7 @@ const InvoiceUploader: React.FC<Props> = ({ onUpload, isLoading, processingCount
         type="file"
         ref={fileInputRef}
         onChange={handleFileChange}
-        accept="image/*"
+        accept="image/*,application/pdf,.pdf"
         multiple
         className="hidden"
       />
@@ -90,7 +90,7 @@ const InvoiceUploader: React.FC<Props> = ({ onUpload, isLoading, processingCount
         <div>
           <h3 className="text-lg font-semibold text-gray-900">Subir Facturas</h3>
           <p className="text-sm text-gray-500 max-w-xs mx-auto">
-            Puedes seleccionar <b>varias imágenes</b> a la vez. Arrástralas aquí o haz clic.
+            Puedes seleccionar <b>varias imágenes o PDFs</b> a la vez. Arrástralas aquí o haz clic.
           </p>
         </div>
         <button

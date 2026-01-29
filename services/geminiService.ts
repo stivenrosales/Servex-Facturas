@@ -17,7 +17,10 @@ if (!apiKey) {
 console.log('✅ Inicializando GoogleGenAI con API key...');
 const ai = new GoogleGenAI({ apiKey });
 
-export async function extractInvoiceData(base64Image: string): Promise<InvoiceData> {
+export async function extractInvoiceData(
+  base64Data: string,
+  mimeType: string = 'image/jpeg'
+): Promise<InvoiceData> {
   const model = ai.models.generateContent({
     model: "gemini-3-flash-preview",
     contents: [
@@ -25,13 +28,14 @@ export async function extractInvoiceData(base64Image: string): Promise<InvoiceDa
         parts: [
           {
             inlineData: {
-              mimeType: "image/jpeg",
-              data: base64Image,
+              mimeType: mimeType,
+              data: base64Data,
             },
           },
           {
-            text: `Extract the details from this invoice image. 
-            Identify the RUC (Tax ID), Company Name (Nombre de la empresa), Address (Dirección), 
+            text: `Extract the details from this invoice ${mimeType.includes('pdf') ? 'document (PDF)' : 'image'}.
+            If this is a multi-page PDF, extract data from all pages and combine line items.
+            Identify the RUC (Tax ID), Company Name (Nombre de la empresa), Address (Dirección),
             and all line items including description, quantity, and amount.
             Be extremely accurate with the RUC (11 digits for Peru).
             Ensure the response is valid JSON according to the schema provided.`,

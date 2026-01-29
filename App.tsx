@@ -7,6 +7,7 @@ import { InvoiceData, AccountingData } from './types';
 import { extractInvoiceData } from './services/geminiService';
 import { exportToERPExcel } from './utils/erpExport';
 import { enrichInvoiceWithAccounting } from './services/accountingMapperService';
+import { getMimeType, isPDF } from './utils/fileTypeDetector';
 
 const App: React.FC = () => {
   const [invoices, setInvoices] = useState<InvoiceData[]>([]);
@@ -27,11 +28,21 @@ const App: React.FC = () => {
       setProgress({ current: count, total: filesData.length });
       
       try {
-        let data = await extractInvoiceData(item.base64);
+        // Detectar tipo de archivo
+        const mimeType = getMimeType(item.file);
+        const fileType = isPDF(item.file) ? 'pdf' : 'image';
+
+        // Extraer datos con Gemini usando el MIME type correcto
+        let data = await extractInvoiceData(item.base64, mimeType);
         const imageUrl = URL.createObjectURL(item.file);
 
-        // Enriquecer con datos contables
-        data = enrichInvoiceWithAccounting({ ...data, imageUrl });
+        // Enriquecer con datos contables y metadata del archivo
+        data = enrichInvoiceWithAccounting({
+          ...data,
+          imageUrl,
+          fileType,
+          fileName: item.file.name
+        });
 
         setInvoices(prev => [data, ...prev]);
       } catch (err: any) {
@@ -41,7 +52,7 @@ const App: React.FC = () => {
     }
 
     if (errors.length > 0) {
-      setError(`No se pudieron procesar algunas imágenes: ${errors.join(', ')}`);
+      setError(`No se pudieron procesar algunos archivos: ${errors.join(', ')}`);
     }
 
     setLoading(false);
@@ -78,7 +89,7 @@ const App: React.FC = () => {
                   Procesamiento <br /><span className="text-blue-500">Multidocumento AI</span>
                 </h2>
                 <p className="text-gray-500 mt-2 text-lg">
-                  Sube múltiples imágenes y extrae RUC, montos y detalles automáticamente.
+                  Sube múltiples imágenes o PDFs y extrae RUC, montos y detalles automáticamente.
                 </p>
               </div>
               
