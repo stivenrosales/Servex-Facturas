@@ -31,6 +31,54 @@ function calcularIGV(total: number): number {
 }
 
 /**
+ * Convierte el símbolo o nombre de moneda a código numérico ERP
+ * - '001' para Soles (S/., PEN, SOL, SOLES)
+ * - '002' para Dólares (USD, $, DOLAR, DOLARES)
+ */
+function convertirCodigoMoneda(moneda: string): string {
+  if (!moneda) {
+    return '001'; // Default: Soles
+  }
+
+  // Normalizar: trim y convertir a mayúsculas
+  const monedaNormalizada = moneda.trim().toUpperCase();
+
+  // Detectar Soles
+  if (
+    monedaNormalizada.includes('S/') ||
+    monedaNormalizada === 'PEN' ||
+    monedaNormalizada === 'SOL' ||
+    monedaNormalizada === 'SOLES'
+  ) {
+    return '001';
+  }
+
+  // Detectar Dólares
+  if (
+    monedaNormalizada.includes('$') ||
+    monedaNormalizada === 'USD' ||
+    monedaNormalizada === 'DOLAR' ||
+    monedaNormalizada === 'DOLARES'
+  ) {
+    return '002';
+  }
+
+  // Default: Soles (caso de moneda no reconocida)
+  console.warn(`⚠️ Moneda no reconocida: "${moneda}". Asumiendo Soles (001).`);
+  return '001';
+}
+
+/**
+ * Determina el código de Cuenta Total según la moneda
+ * - '421211' para Soles
+ * - '421212' para Dólares
+ */
+function determinarCuentaTotal(moneda: string): string {
+  const codigoMoneda = convertirCodigoMoneda(moneda);
+  return codigoMoneda === '001' ? '421211' : '421212';
+}
+
+/**
  * Extrae el número de serie de la factura
  * Por ahora retorna placeholder "F001", pero puede ser mejorado
  * para extraer de campos específicos de la factura
@@ -122,13 +170,13 @@ function generateERPData(invoices: InvoiceData[]): any[] {
 
       erpData.push({
         // Datos de identificación del documento
-        'Tipo': 'FAC', // Factura (puede ser configurable)
+        'Tipo': '01', // Código numérico para Factura en ERP
         'Serie': extractSerie(inv),
         'Numero': extractNumero(inv.id),
         'Fecha': formatFecha(inv.fechaEmision),
 
         // Datos monetarios
-        'Mnd': inv.moneda || 'PEN', // Moneda (PEN, USD, EUR)
+        'Mnd': convertirCodigoMoneda(inv.moneda), // Código numérico de moneda
         'Base Gravada': calcularBaseGravada(montoTotal),
         'Base NO Gravada': 0, // Por defecto 0 (puede ser calculado si es necesario)
         'IGV': calcularIGV(montoTotal),
@@ -151,7 +199,7 @@ function generateERPData(invoices: InvoiceData[]): any[] {
 
         // Datos adicionales
         'Tipo Gasto': determinarTipoGasto(item.descripcion),
-        'Cta Total': acc?.cuentaContable || 'NO MAPEADO',
+        'Cta Total': determinarCuentaTotal(inv.moneda),
         'Agrupacion': '', // Vacío por defecto
 
         // Metadata (opcional, para debugging)
